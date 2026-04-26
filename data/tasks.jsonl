@@ -1,0 +1,2 @@
+{"question": "How many P0 tickets are open?", "expected_terms": ["open_p0"]}
+{"question": "What is the escalation rule for P0 incidents?", "expected_terms": ["incident commander"]}

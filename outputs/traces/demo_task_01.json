@@ -1,0 +1,13 @@
+{
+  "answer": "Database result: [{'open_p0': 1}]",
+  "confidence": 0.86,
+  "trace": [
+    {
+      "tool": "sql",
+      "args": {
+        "query": "SELECT COUNT(*) AS open_p0 FROM tickets WHERE priority='P0' AND status='open'"
+      },
+      "observation": "[{'open_p0': 1}]"
+    }
+  ]
+}
