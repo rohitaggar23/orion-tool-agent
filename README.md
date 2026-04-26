@@ -1,100 +1,88 @@
 # Orion Tool Agent
-**Tool-using agent framework with guardrails, auditable traces, and offline task evaluation.**
 
-![Status](https://img.shields.io/badge/status-fully%20run-success)
-![Type](https://img.shields.io/badge/type-agents%20%2B%20tools-blue)
-![Outputs](https://img.shields.io/badge/outputs-traces%20%2B%20metrics%20%2B%20report-purple)
-![Tests](https://img.shields.io/badge/tests-passing-success)
+Orion is a tool-using agent framework with SQL guardrails, deterministic planning, auditable traces, and offline text-to-SQL diagnostics.
 
----
+The project demonstrates a compact agent runtime built around practical tool orchestration: a planner routes user tasks to SQL, retrieval, calculator, and file tools; guardrails enforce read-only SQL and sandboxed file access; every tool call is written to a trace for inspection and regression analysis.
 
-## Overview
+## Core Capabilities
 
-Orion is a small tool-using agent built for enterprise-style workflows. The demo agent can:
+- Deterministic planner for reproducible demonstrations and CI checks.
+- SQL tool with SELECT-only enforcement.
+- Local knowledge retrieval over Markdown reference material.
+- Safe calculator and sandboxed file-read tools.
+- Structured trace capture for each tool call.
+- Full Spider text-to-SQL diagnostic pipeline over query complexity, SQL features, domains, and guardrail outcomes.
 
-- query a **SQLite** support-ticket database (SELECT-only enforcement)
-- retrieve from a small local knowledge base
-- use a calculator tool
-- emit an **auditable trace** of tool calls (arguments + observations)
+## Dataset
 
-The repo also includes an offline evaluator that runs a JSONL task set and reports success rate.
+The included dataset is `data/train-00000-of-00001_spider.parquet`, a Spider text-to-SQL training split stored as parquet. Each row contains a natural-language question, database identifier, SQL program, and related schema metadata. The repository uses this dataset for static SQL diagnostics and guardrail validation.
 
----
+Execution accuracy is intentionally not reported because the original SQLite database files are not included. The generated metrics therefore focus on dataset coverage, SQL feature analysis, complexity distribution, and guardrail behavior.
 
-## Built-in tools & guardrails
+## Full-Run Results
 
-- **SQL tool** with read-only (SELECT-only) enforcement
-- **knowledge retriever** (local files)
-- **calculator**
-- deterministic rule planner for reproducible demos (with an interface for LLM planners)
-- trace capture for audit/debugging
+The full dataset was processed through `scripts/run_spider_full_pipeline.py`.
 
----
+| Metric | Result |
+|---|---:|
+| Tasks processed | 7,000 |
+| Unique databases | 140 |
+| SELECT-only guardrail pass rate | 100.0% |
+| Average SQL length | 21.9 tokens |
+| Median SQL length | 16.0 tokens |
+| Average complexity score | 5.3 |
 
-## Included outputs (already generated)
+Lead result:
+
+![Orion Spider full-pipeline scorecard](outputs/spider_full_pipeline/figures/01_spider_pipeline_scorecard.png)
+
+Additional figures:
+
+- `outputs/spider_full_pipeline/figures/02_sql_feature_coverage.png`
+- `outputs/spider_full_pipeline/figures/03_database_distribution.png`
+- `outputs/spider_full_pipeline/figures/04_complexity_mix.png`
+- `outputs/spider_full_pipeline/figures/05_question_vs_sql_length.png`
+- `outputs/spider_full_pipeline/figures/06_pipeline_tooling_outcomes.png`
+
+Generated artifacts:
+
+- `outputs/spider_full_pipeline/metrics/spider_full_pipeline_metrics.json`
+- `outputs/spider_full_pipeline/spider_full_pipeline_results.csv`
+- `outputs/spider_full_pipeline/traces/spider_full_pipeline_traces.jsonl`
+- `outputs/spider_full_pipeline/README.md`
+
+## Architecture
 
 ```text
-outputs/metrics/eval_metrics.json
-outputs/reports/EXPERIMENT_REPORT.md
-outputs/traces/demo_task_01.json
-outputs/traces/demo_task_02.json
-outputs/logs/run_demo.log
-outputs/figures/success_rate.png
-outputs/figures/tool_calls_per_task.png
+User task or Spider row
+  -> deterministic planner or offline dataset loader
+  -> tool routing and SQL analysis
+  -> SELECT-only guardrail
+  -> tool result or static diagnostic
+  -> trace, metrics, report, and figures
 ```
 
-### Preview
+## Quickstart
 
-**Offline task success rate**
+```bash
+python -m venv .venv
+pip install -e .
+PYTHONPATH=src pytest -q
+PYTHONPATH=src python scripts/run_spider_full_pipeline.py
+```
 
-![Success rate](outputs/figures/success_rate.png)
-
-**Tool calls per task**
-
-![Tool calls](outputs/figures/tool_calls_per_task.png)
-
----
-
-## Run
+Small built-in demo:
 
 ```bash
 bash scripts/generate_outputs.sh
 ```
 
-Open the report:
+## Repository Layout
 
-- `outputs/reports/EXPERIMENT_REPORT.md`
-
----
-
-## Tests
-
-```bash
-PYTHONPATH=src pytest -q
+```text
+data/               Demo data and Spider parquet
+outputs/            Generated metrics, traces, tables, and figures
+scripts/            Demo and full-dataset runners
+src/orion_agent/    Agent runtime, tools, guardrails, and evaluator
+tests/              Unit tests
 ```
-
----
-
-## Trace format (example)
-
-A trace contains tool calls and observations:
-
-```json
-{
-  "trace": [
-    {
-      "tool": "sql",
-      "args": {"query": "SELECT COUNT(*) AS open_p0 FROM tickets WHERE priority='P0' AND status='open'"},
-      "observation": "[{'open_p0': 1}]"
-    }
-  ]
-}
-```
-
----
-
-## Notes
-
-- The deterministic planner keeps demos reproducible.
-- Traces are captured without exposing private chain-of-thought.
-

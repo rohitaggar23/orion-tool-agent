@@ -1,0 +1,49 @@
+{
+  "avg_complexity_score": 5.304285714285714,
+  "avg_question_tokens": 13.445571428571428,
+  "avg_sql_tokens": 21.857714285714287,
+  "avg_tables_per_query": 1.5572857142857144,
+  "clause_rates": {
+    "AGGREGATION": 0.46714285714285714,
+    "GROUP BY": 0.25357142857142856,
+    "HAVING": 0.061,
+    "JOIN": 0.39585714285714285,
+    "LIMIT": 0.15814285714285714,
+    "ORDER BY": 0.23257142857142857,
+    "SET OP": 0.07514285714285714,
+    "SUBQUERY": 0.07442857142857143,
+    "WHERE": 0.5002857142857143
+  },
+  "complexity_tier_counts": {
+    "Advanced": 1003,
+    "Complex": 2231,
+    "Moderate": 1398,
+    "Simple": 2368
+  },
+  "dataset": "data\\train-00000-of-00001_spider.parquet",
+  "execution_accuracy": null,
+  "execution_accuracy_note": "Not computed because the Spider SQLite database files are not included in this repository.",
+  "generated_at": "2026-04-26T09:23:11.941973+00:00",
+  "guardrail_pass_rate": 1.0,
+  "guardrail_passed": 7000,
+  "median_sql_tokens": 16.0,
+  "top_databases": {
+    "allergy_1": 98,
+    "bike_1": 104,
+    "college_1": 164,
+    "college_2": 170,
+    "cre_Doc_Tracking_DB": 90,
+    "dorm_1": 100,
+    "driving_school": 93,
+    "flight_1": 96,
+    "hospital_1": 100,
+    "hr_1": 124,
+    "movie_1": 98,
+    "music_1": 100,
+    "music_2": 100,
+    "soccer_2": 106,
+    "store_1": 112
+  },
+  "total_tasks": 7000,
+  "unique_databases": 140
+}
